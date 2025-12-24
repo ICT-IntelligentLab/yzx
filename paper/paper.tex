@@ -1,0 +1,305 @@
+\documentclass[lettersize,journal]{IEEEtran}
+\usepackage{amsmath,amsfonts}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{array}
+\usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
+\usepackage{textcomp}
+\usepackage{stfloats}
+\usepackage{url}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\usepackage{cite}
+\hyphenation{op-tical net-works semi-conduc-tor IEEE-Xplore}
+
+
+\begin{document}
+
+\title{A Security-Oriented Semantic Broadcast System with Knowledge Base Asymmetry}
+
+\author{Zhuangxu Yang}
+
+
+\maketitle
+
+\begin{abstract}
+With the rapid development of semantic communications for sixth-generation (6G) wireless systems, ensuring semantic-level security over shared broadcast channels has become a critical challenge. Conventional physical-layer security methods, which rely on channel differences or encryption, are not directly applicable to semantic communication systems. To address the multi-user security issue in broadcast scenarios, this paper proposes a security-oriented semantic broadcast system with knowledge base asymmetry. The transmitter employs a standard knowledge base, while receivers share identical knowledge content but adopt different semantic-space mappings. As semantic encoding and decoding are tightly coupled with the knowledge base mapping, mismatched mappings at non-target receivers cause semantic misalignment. Without introducing additional encryption or modifying channel coding, the proposed scheme enables selective semantic transmission in broadcast channels. Simulation results demonstrate that only the intended receiver can accurately recover the semantic content, while other receivers fail to obtain meaningful information.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Semantic communication,background knowledge base,broadcast systems,semantic security
+\end{IEEEkeywords}
+
+\section{Introduction}
+\IEEEPARstart{W}{ith} the mature development of fifth-generation (5G) wireless systems, 6G technologies have attracted increasing attention \cite{ref1}. 6G is expected to support massive numbers of devices and data volumes, where transmitted information include multimodal and heterogeneous content. However, conventional digital communication systems are approaching their theoretical limits: source coding is close to the rate distortion bound, while channel coding schemes, such as low-density parity-check (LDPC) codes \cite{ref2} and polar codes, have nearly achieved channel capacity. These limitations motivate the exploration of new communication paradigms.Semantic communication has emerged as a promising approach to overcome these bottlenecks. Instead of ensuring bit-level accuracy, semantic communication focuses on conveying the intended meaning of the information. By extracting and transmitting semantic representations, the receiver only needs to recover semantically consistent information rather than identical bit sequences, enabling higher efficiency and robustness in noisy environments \cite{ref3}. This paradigm provides a new technological pathway for future 6G communication systems.
+
+A key distinction between semantic and conventional communication lies in the introduction of a shared knowledge base between the transmitter and the receiver. The knowledge base stores prior information such as entities, concepts, and relationships, serving as the foundation for semantic understanding and compression \cite{ref4}. In semantic communication systems, the transmitter encodes semantic information based on this shared knowledge, while the receiver reconstructs the message by combining the received semantic information with its local knowledge base, thereby reducing transmission cost \cite{ref5}. Recent research has focused on efficient semantic knowledge representation and utilization \cite{ref6}, including knowledge-enhanced receivers \cite{ref7}, shared implicit knowledge models \cite{ref8}, and task-oriented knowledge base design \cite{ref9}.However, existing research still faces several challenges:(1)Knowledge base alignment across different devices is difficult to guarantee;(2)Lack of effective security methods,when all receiving ends receive the same signal, how to only allow the target user to restore semantic information remains a difficult problem.
+
+To address these challenges, this paper proposes a security-oriented semantic broadcast system with knowledge base asymmetry. By exploiting identical knowledge content with different semantic-space mappings, the proposed method enables selective semantic decoding.
+
+\section{System Model}
+This section presents the overall model and workflow of the studied system, with a focus on the system architecture,channel model,knowledge base construction,and the encoding and decoding methods for selective transmission.
+\subsection{System Architecture}
+The system adopts a broadcast architecture with a single transmitter, Alice, and multiple receivers, denoted as Bob$1$, Bob$2$, and Bob$3$. A shared broadcast channel is used at the physical layer, where Alice transmits a signal that can be received by all receivers. Unlike conventional physical-layer security schemes, the proposed system introduces knowledge base asymmetry at the semantic layer to enable selective semantic transmission. As a result, only the designated target receiver can correctly recover the transmitted semantic information, while the other receivers obtain incorrect or meaningless decoding results despite receiving the same signal. For example, when Bob1 is the target receiver, all Bobs decode the received signal, but only Bob1 can accurately reconstruct the original semantic content. The overall system architecture is shown in Fig.~\ref{system}.
+\begin{figure*}[!t]
+	\centering
+	\includegraphics[width=0.8\textwidth]{system.png}
+	\caption{System Model of the Proposed Knowledge-Asymmetric Semantic Broadcast Communication.}
+	\label{system}
+\end{figure*}
+
+\subsection{Channel Model} 
+The system evaluates performance over two typical wireless channels: additive white Gaussian noise (AWGN) and Rayleigh fading channels.
+
+\subsubsection{AWGN Channel}
+In the AWGN channel, the transmitted signal is affected only by independent Gaussian noise without fading or multipath effects. The received signal is
+\begin{equation}
+	y = x + n,
+\end{equation}
+where $x$ is the transmitted symbol, $y$ is the received symbol, and $n \sim \mathcal{N}(0,\sigma^2)$ is additive Gaussian noise with zero mean and variance $\sigma^2$.
+
+\subsubsection{Rayleigh Fading Channel}
+To model realistic wireless propagation, a Rayleigh fading channel is also considered:
+\begin{equation}
+	y = h x + n,
+\end{equation}
+where $h \sim \mathcal{CN}(0,1)$ is the complex channel gain with Rayleigh-distributed magnitude, and $n$ is AWGN.
+
+For the broadcast scenario, all receivers obtain the transmitted symbol simultaneously:
+\begin{equation}
+	y_i = h_i x + n_i, \quad i \in \{1,2,3\},
+\end{equation}
+where $h_i$ and $n_i$ are the channel gain and noise for receiver Bob$i$. While channel gains and noise differ among receivers, the signal structure remains identical.
+
+
+\subsection{Knowledge Base Construction}
+The system assumes exist a global background knowledge set $\mathcal{K}$, which represents the prior information required for semantic communication. Alice extracts the task-relevant knowledge from $\mathcal{K}$ to construct a standard knowledge base $K$.
+
+The three receivers, Bob$1$, Bob$2$, and Bob$3$, respectively maintain local knowledge bases $K_1$, $K_2$, and $K_3$. It should be noted that:
+\begin{itemize}
+	\item At the content level, the knowledge contained in $K_1$, $K_2$, and $K_3$ is exactly same, all originating from the same background knowledge set $\mathcal{K}$;
+	\item At the mapping level, different knowledge mappings were adopted by different receiver when building the local knowledge base. This can be expressed as each receiver applying a different permutation $\pi_i$ to the standard knowledge base $K$:
+	\begin{equation}
+		K_i = \pi_i(K), \quad i \in \{1,2,3\},
+	\end{equation}
+	where Bob$1$ Bob$2$, and Bob$3$ correspond to permutations $\pi_1$, $\pi_2$, and $\pi_3$.
+\end{itemize}
+
+This construction, in which the knowledge content is identical but the mappings differ, causes the same knowledge dimensions to be misaligned across different receivers in the vector space. Moreover, since all receivers' knowledge bases are derived from the standard knowledge base $K$, the transmitter Alice has full knowledge of the knowledge base configurations at all receivers. 
+
+\subsection{Encoding and Decoding Process}
+
+\subsubsection{Encoding Process}
+The encoding process at the transmitter consists of two parts: semantic encoding and channel encoding. The objective is to map the original information into a semantic vector and then transform the semantic vector into a symbol sequence suitable for transmission over the wireless channel.
+
+For text transmission, a sentence $s = [w_1, w_2, \dots, w_l]$ is processed as follows. Alice selects the target receiver Bob$i$ and extracts the corresponding local knowledge base $K_i$ from the standard knowledge base $K$. The semantic encoder generates a semantic vector:
+\begin{equation}
+	r = f_{\mathrm{SE}}(s, K_i),
+\end{equation}
+where $f_{\mathrm{SE}}(\cdot)$ is the Transformer-based semantic encoding network. The vector $r$ is then mapped to channel symbols by the channel encoder:
+\begin{equation}
+	x = f_{\mathrm{CE}}(r),
+\end{equation}
+where $f_{\mathrm{CE}}(\cdot)$ is the channel encoding module. The channel encoder adopts fully connected layers with different output units.The system uses an autoencoder structure to protect key semantic information.
+\subsubsection{Decoding Process}
+At each receiver, the received signal $y_i$ is first decoded to estimate the semantic vector:
+\begin{equation}
+	\hat{r}_i = f_{\mathrm{CD}}(y_i),
+\end{equation}
+where $f_{\mathrm{CD}}(\cdot)$ denotes the channel decoding network. Then, the semantic decoder reconstructs the message using the local knowledge base:
+\begin{equation}
+	\hat{s}_i = f_{\mathrm{SD}}(\hat{r}_i, K_i),
+\end{equation}
+where $f_{\mathrm{SD}}(\cdot)$ is the semantic decoding network.
+
+\begin{table}[t]
+	\begin{center}
+		\caption{The setting of the Semantic network}
+		\label{network}
+		\begin{tabular}{| c | c | c |}
+			\hline
+			Layer Name & Units & Activation \\
+			\hline
+			$4 \times$ Transformer & $128$ & ReLU \\
+			\hline
+			Dense & $256$ & ReLU \\
+			\hline
+			Dense & $16$ & ReLU \\
+			\hline
+			Channel model & AWGN / Rayleigh & \\
+			\hline
+			Dense & $256$ & ReLU \\
+			\hline
+			Dense & $128$ & LayerNorm \\
+			\hline
+			$4 \times$ Transformer & $128$ & ReLU \\
+			\hline
+			Prediction layer & $13748$ & Softmax \\
+			\hline
+		\end{tabular}
+	\end{center}
+\end{table}
+
+\begin{table}[t]
+	\begin{center}
+		\caption{Ideal Channel}
+		\label{nc}
+		\begin{tabular}{| c | c |}
+			\hline
+			Receiver & BLEU (1-gram) \\
+			\hline
+			Bob1 & 0.98808 \\
+			\hline
+			Bob2 & 0.00068 \\
+			\hline
+			Bob3 & 0.00073 \\
+			\hline
+		\end{tabular}
+	\end{center}
+\end{table}
+
+\section{Simulation Results and Analysis}
+
+This paper conducts simulation experiments based on a text transmission task,and Bob$1$ is set as the target receiver by default. The simulation parameter settings and performance analysis results are introduced sequentially below.
+
+\subsection{Performance Metrics}
+Since the system targets semantic rather than bit-level accuracy, the BLEU metric \cite{ref10} is used to evaluate semantic similarity, from 1-gram to 4-gram. BLEU ranges in $[0,1]$, the higher the value is, the closer the similarity between the restored text and the original text will be.
+
+Let the source sentence be $s$ of length $l_s$, and the recovered sentence $\hat{s}$ of length $\hat{l}_s$. To prevent distortion from short sentences, a brevity penalty (BP) is applied:
+\begin{equation}
+	\mathrm{BP} =
+	\begin{cases}
+		1, & \hat{l}_s > l_s, \\
+		\exp\left(1 - \frac{l_s}{\hat{l}_s}\right), & \hat{l}_s \le l_s.
+	\end{cases}
+\end{equation}
+
+The BLEU score is then
+\begin{equation}
+	\mathrm{BLEU} = \mathrm{BP} \cdot \exp\left( \sum_{n=1}^{N} w_n \log p_n \right),
+\end{equation}
+where $w_n$ are weights summing to 1, and $p_n$ is the $n$-gram precision:
+\begin{equation}
+	p_n = \frac{\sum_{k} \min(C_k(s), C_k(\hat{s}))}{\sum_{k} C_k(\hat{s})}.
+\end{equation}
+
+Equivalently, in logarithmic form:
+\begin{equation}
+	\log \mathrm{BLEU} = \min\left(1 - \frac{l_s}{\hat{l}_s}, 0 \right) + \sum_{n=1}^{N} w_n \log p_n.
+\end{equation}
+
+\begin{figure*}[!t]
+	\centering
+	\subfloat[AWGN]{\includegraphics[width=0.9\textwidth]{AWGN.png}
+		\label{AWGN}}
+	\hfil
+	\subfloat[Rayleigh]{\includegraphics[width=0.9\textwidth]{Rayleigh.png}
+		\label{Rayleigh}}
+	\caption{Under AWGN and Rayleigh channels, the BLEU scores of the system ranging from 1-gram to 4-gram.}
+	\label{channel_compare}
+\end{figure*}
+
+
+\begin{figure*}[!t]
+	\centering
+	\subfloat[]{\includegraphics[width=0.9\textwidth]{MRC_2.png}
+		\label{MRC_2}}
+	\hfil
+	\subfloat[]{\includegraphics[width=0.9\textwidth]{MRC_4.png}
+		\label{MRC_4}}
+	\caption{After the system uses the MRC method in the Rayleigh channel, the BLEU scores are calculated using two antennas and four antennas respectively.}
+	\label{MRC}
+\end{figure*}
+
+\begin{figure}[!t]
+	\centering
+	\includegraphics[width=0.9\linewidth]{mi.png}
+	\caption{Mutual information under the AWGN channel}
+	\label{mi}
+\end{figure}
+
+
+\subsection{Simulation Parameters}
+The adopted dataset is a Chinese Wikipedia corpus. The dataset is pre-processed into lengths of sentences with 10 to 50 words.After preprocessing, the resulting dataset contains approximately $2.55\times10^{6}$ sentences in the training set and about $2.8\times10^{5}$ sentences in the test set.
+
+A Transformer-based semantic communication model is adopted. The semantic encoder and decoder consist of multiple Transformer layers for high-level feature extraction and reconstruction, while the channel encoder and decoder use dense layers for robustness under noisy channels. ReLU, Dropout, and Layer Normalization are applied to improve training stability and generalization. Main parameters are listed in Table~\ref{network}.Experiments run on a system with Intel Xeon Platinum 8358P CPU and NVIDIA RTX 4090 GPU, using PyTorch 2.0.0 and CUDA 11.8.
+
+
+\subsection{Results Analysis}
+
+\subsubsection{Ideal Channel}
+Under ideal conditions without noise or fading (Table~\ref{nc}), the target receiver Bob1 achieves a BLEU (1-gram) score of 0.988, indicating near-perfect semantic recovery. Non-target receivers Bob2 and Bob3 have BLEU scores close to zero, demonstrating effective selective semantic transmission.
+
+\subsubsection{AWGN and Rayleigh Channels}
+Fig.~\ref{AWGN} shows BLEU performance in AWGN channels. Bob1's BLEU rapidly increases with SNR, approaching 1 beyond 4dB, exhibiting consistent trends across 1-gram to 4-gram evaluations.However,  Bob2 and Bob3 remain near zero.  In Rayleigh fading channels (Fig.~\ref{Rayleigh}), Bob1's BLEU degrades at low SNR but improves with higher SNR, approaching ideal performance. BLEU scores of Bob2 and Bob3 remain negligible, confirming stable semantic security under fading.
+
+\subsubsection{Multi-Antenna Reception with MRC}
+To enhance robustness, maximal ratio combining (MRC) is applied at the receiver with two or four antennas. Figs.~\ref{MRC_2} and~\ref{MRC_4} show that increasing antennas significantly improves Bob1's BLEU at medium-to-low SNR, while Bob2 and Bob3 remain near zero, validating selective transmission and security in multi-antenna scenarios.
+
+\subsubsection{Mutual Information}
+Fig.~\ref{mi} illustrates the relationship between SNR and mutual information after training. Mutual information increases with SNR, enabling the encoder to better capture the data distribution and improving learning performance.
+
+
+\section{Conclusion}
+This paper studies selective transmission in multi-user semantic communication based on knowledge base asymmetry. Different receivers have different semantic mappings, so only the target receiver can accurately reconstruct the original information. Experiments show that under ideal conditions, the target receiver recovers semantics nearly perfectly, while non-target receivers fail. Under AWGN and Rayleigh channels, the target receiver maintains high performance at medium-to-high SNR. Introducing maximal ratio combining with multi-antenna reception further improves semantic transmission under fading channels.
+
+\newpage
+
+\begin{thebibliography}{1}
+\bibliographystyle{IEEEtran}
+
+\bibitem{ref1}
+H. Tataria, M. Shafi, A. F. Molisch, M. Dohler, H. Sj\"{o}land, and F. Tufvesson,
+``6G Wireless Systems: Vision, Requirements, Challenges, Insights, and Opportunities,''
+\textit{Proc. IEEE}, vol. 109, no. 7, pp. 1166--1199, Jul. 2021.
+
+\bibitem{ref2}
+Y. Fang, G. Bi, Y. L. Guan, and F. C. M. Lau,
+``A Survey on Protograph LDPC Codes and Their Applications,''
+\textit{IEEE Commun. Surveys Tuts.}, vol. 17, no. 4, pp. 1989--2016, 4th Quart. 2015.
+
+\bibitem{ref3}
+C. Chaccour, W. Saad, M. Debbah, Z. Han, and H. V. Poor,
+``Less Data, More Knowledge: Building Next-Generation Semantic Communication Networks,''
+\textit{IEEE Commun. Surveys Tuts.}, vol. 27, no. 1, pp. 37--76, Feb. 2025.
+
+\bibitem{ref4}
+Y. Shao, Q. Cao, and D. G\"{u}nd\"{u}z,
+``A Theory of Semantic Communication,''
+\textit{IEEE Trans. Mobile Comput.}, vol. 23, no. 12, pp. 12211--12228, Dec. 2024.
+
+\bibitem{ref5}
+X. Luo, H.-H. Chen, and Q. Guo,
+``Semantic Communications: Overview, Open Issues, and Future Research Directions,''
+\textit{IEEE Wireless Commun.}, vol. 29, no. 1, pp. 210--219, Feb. 2022.
+
+\bibitem{ref6}
+L. Wang, W. Wu, F. Zhou, F. Tian, Q. Wu, and W. Saad,
+``A Unified Hierarchical Semantic Knowledge Base for Multi-Task Semantic Communication,''
+in \textit{Proc. IEEE Int. Conf. Commun. (ICC)}, Denver, CO, USA, pp. 2937--2943, 2024.
+
+\bibitem{ref7}
+B. Wang, R. Li, J. Zhu, Z. Zhao, and H. Zhang,
+``Knowledge Enhanced Semantic Communication Receiver,''
+\textit{IEEE Commun. Lett.}, vol. 27, no. 7, pp. 1794--1798, Jul. 2023.
+
+\bibitem{ref8}
+H. Xie, Z. Qin, G. Y. Li, and B.-H. Juang,
+``Deep Learning Enabled Semantic Communication Systems,''
+\textit{IEEE Trans. Signal Process.}, vol. 69, pp. 2663--2675, 2021.
+
+\bibitem{ref9}
+D. G\"{u}nd\"{u}z, A. Yener, A. Goldsmith, H. V. Poor, and S. Shamai,
+``Beyond Transmitting Bits: Context, Semantics, and Task-Oriented Communications,''
+\textit{IEEE J. Sel. Areas Commun.}, vol. 41, no. 1, pp. 5--41, Jan. 2023.
+
+\bibitem{ref10}
+K. Papineni, S. Roukos, T. Ward, and W.-J. Zhu,
+``BLEU: A Method for Automatic Evaluation of Machine Translation,''
+in \textit{Proc. 40th Annu. Meeting Assoc. Comput. Linguistics (ACL)},
+pp. 311--318, 2002.
+\end{thebibliography}
+
+\end{document}
+
+
